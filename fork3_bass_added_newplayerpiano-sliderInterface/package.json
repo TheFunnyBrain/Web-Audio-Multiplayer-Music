@@ -1,0 +1,11 @@
+{
+  "name": "networktest",
+  "version": "1.0.0",
+  "description": "testing chapter 9 on rainingchain",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adam",
+  "license": "ISC"
+}

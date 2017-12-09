@@ -1,0 +1,1000 @@
+<div style="background-color:orange"><h1>Music Maker!</h1></div>
+
+<div id="signDiv">
+	<h2>Welcome to the Music maker! Please sign in below...</h2>
+    Username: <input id="signDiv-username" type="text"></input><br>
+    Password: <input id="signDiv-password" type="password"></input>
+    <button id="signDiv-signIn">Sign In</button>
+    <button id="signDiv-signUp">Sign Up</button>
+</div>
+ 
+<div id="mainPlayerDiv" style="display:none;">
+	<div id ="transport">
+		<button id="playbackToggle">Play/pause Button (will look pretty soon)</button>
+		<button id="freezeToggle">Time Freeze!</button>
+		<button id="resetTimeSig">Reset Time Sig</button>
+	</div>
+	<div id="sequencersContainerDiv" style="border:solid;display:inline-block">
+	<div id="sequencersVisibleToggleDiv" style="background-color:orange" onclick="onSequencersVisibleToggleClick()"><h2>Sequencers (tap here to show/hide)</h2></div>
+	<div id="sequencersMainDiv">
+	<div id="leadStepSequencerMainDiv"style="background-color:grey; display:inline-block;border:solid">
+		<h3>Lead Synth</h3>
+
+		<div id="leadStepSequencerUI" onclick="onLeadSynthClick()">
+		</div>
+		<div id="leadSequencerButtons">
+			<div>
+			<!--These don't work currently
+			<button id="removeStepColumn">Remove Column</button>
+			<button id="addStepColumn">Add Column</button>-->
+			</div>
+			<div>
+			<button id="leadStepSequencerLegatoButton">Legato</button>
+			<button id="leadStepSequencerStaccatoButton">Staccato</button>
+			<button id="leadAddColumnButton">Add Column</button>
+			<button id="leadRemoveColumnButton">Remove Column</button>
+			</div>
+		</div>
+	</div>
+	
+	<div id="bassStepSequencerMainDiv" style="display:inline-block;border:solid">
+		<h3>Bass Synth</h3>
+
+		<div id="bassStepSequencerUI" onclick="onBassSynthClick()">
+		</div>
+		<div id="bassSequencerButtons">
+				<div>
+				<!--These don't work currently
+				<button id="removeStepColumn">Remove Column</button>
+				<button id="addStepColumn">Add Column</button>-->
+				</div>
+			<div>
+				<button id="bassStepSequencerLegatoButton">Legato</button>
+				<button id="bassStepSequencerStaccatoButton">Staccato</button>
+				<button id="bassAddColumnButton">Add Column</button>
+				<button id="bassRemoveColumnButton">Remove Column</button>
+			</div>
+		</div>
+	</div>
+	<div id="drumStepSequencerMainDiv" style="display:inline-block;border:solid">
+		<h3>Drums</h3>
+
+		<div id="drumStepSequencerUI" onclick="onDrumClick()">
+		</div>
+		<div id="drumSequencerButtons">
+			<div>
+			<button id="drumAddColumnButton">Add Column</button>
+			<button id="drumRemoveColumnButton">Remove Column</button>
+			<!--These don't work currently
+			<button id="removeStepColumn">Remove Column</button>
+			<button id="addStepColumn">Add Column</button>-->
+			</div>
+		</div>
+	</div>
+	
+	</div>
+	</div>
+	<div id="controllerContainerDiv" style="border:solid;display:inline-block">
+	<div id="controllerVisibleToggleDiv" style="background-color:orange" onclick="onControllerVisibleToggleClick()"><h2>Your Instrument - Click here to show/hide</h2></div>
+	<div id="controllerMainDiv"style="background-color:grey;display:inline-block">
+		<h3>Your very own musical instrument!</h3>
+		<div id="playerPianoNoteControlDiv">
+		</div>
+		<div id="playerSliderNoteControlDiv" style="display:none;">
+		</div>
+		<br>
+		<div id="playerNoteInterfaceButtons">
+		<button id="playerControlPianoButton">Piano</button>
+		<button id="playerControlSliderButton">Slider</button>
+			<ul>
+				<li>Piano: Touch the keys to play notes.</li>
+				<li>Slider: Touch the line to play notes, this lets you sweep up and down notes.</li>
+			</ul>
+		</div>
+	
+	<div id="waveTypeButtons">
+		<button id="gameDiv-Sawtooth">Sawtooth</button>
+		<button id="gameDiv-Sine">Sine</button>
+		<button id="gameDiv-Square">Square</button>
+		<button id="gameDiv-Triangle">Triangle</button>
+		<ul>
+			<li>Sawtooth: A buzzy sound. I'll pop in a picture here.</li>
+			<li>Sine: A beepy sound.</li>
+			<li>Square: A roboty sound.</li>
+			<li>Triangle: Like a sine, but a bit grunty.</li>
+		</ul>
+	</div>
+	<div id="playerNoteLength", style="background-color:grey">
+		<button id="gameDiv-Legato">Legato</button>
+		<button id="gameDiv-Square">On/Off</button>
+		<button id="gameDiv-Triangle">Quantise</button>
+		<ul>
+			<li>Legato: Your note will ring out forever, but you can still change its pitch.</li>
+			<li>On/Off: Your note will play as soon as you tap the controls, and stop when you let go.</li>
+			<li>Quantise: Your note will play on the next beat, and stop when you let go, waiting until the next beat so it sounds in time.</li>
+		</ul>
+	</div>
+	<div id="playerPositionMainDiv">
+	<div id="playerPositionControl"></div>
+	</div>
+</div>
+</div>
+<div id="chatVisibleToggleDiv" style="background-color:orange" onclick="onChatVisibleToggleClick()"><h2>Chat box - Click here to show/hide</h2></div>
+<div id="chat-divContainer" style="display:inline-block">
+	<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
+		<div>You're in! Please do say hello! :)</div>
+	</div>
+
+	<form id="chat-form">
+		<input id="chat-input" type="text" style="width:500px"></input>
+	</form>
+</div>
+</div>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script src="https://rawgit.com/nexus-js/ui/master/dist/NexusUI.js"></script>
+<script>
+
+
+	//Web Audio Setting up
+	var audio_context = window.AudioContext || window.webkitAudioContext;
+	var con = new audio_context();
+	
+	
+	//TRYING A THING
+	var osc = [];
+	osc.id = [];
+	var amp = [];
+	
+	//TESTING
+	var playerMasterAmp = con.createGain();
+	playerMasterAmp.connect(con.destination);
+	playerMasterAmp.gain.value = 1;
+	
+	//for now eveything is going to con.destination rwithout a gain or anything nice - Adam should expect clipping in intial versions, it might get loud!
+
+	//Everything node based
+	var socket = io('http://localhost:2000');
+
+	//sign
+	var signDiv = document.getElementById('signDiv');
+	var signDivUsername = document.getElementById('signDiv-username');
+	var signDivSignIn = document.getElementById('signDiv-signIn');
+	var signDivSignUp = document.getElementById('signDiv-signUp');
+	var signDivPassword = document.getElementById('signDiv-password');
+   
+    signDivSignIn.onclick = function(){
+        socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
+    }
+    signDivSignUp.onclick = function(){
+        socket.emit('signUp',{username:signDivUsername.value,password:signDivPassword.value});
+    }
+    socket.on('signInResponse',function(data){
+        if(data.success){
+            signDiv.style.display = 'none';
+            mainPlayerDiv.style.display = 'inline-block';
+        } else
+            alert("Sign in unsuccessul.");
+    });
+    socket.on('signUpResponse',function(data){
+        if(data.success){
+            alert("Sign up successul.");
+        } else
+            alert("Sign up unsuccessul.");
+    });
+ 
+    //chat
+    var chatText = document.getElementById('chat-text');
+    var chatInput = document.getElementById('chat-input');
+    var chatForm = document.getElementById('chat-form');
+
+   
+    socket.on('addToChat',function(data){
+        chatText.innerHTML += '<div>' + data + '</div>';
+    });
+    socket.on('evalAnswer',function(data){
+        console.log(data);
+    });
+	
+var osc = [];
+	
+	//Transport Toggle
+		var playbackToggleBool = true;
+	//going to want an initpack
+	
+	var playbackToggleButton = document.getElementById('playbackToggle');
+	
+	
+	
+	playbackToggleButton.onmousedown = function(){
+		playbackToggleBool = !playbackToggleBool;
+		console.log("Playback is now: " + playbackToggleBool);
+		socket.emit('transportOnChange',playbackToggleBool)
+		if(playbackToggleBool === true){
+			bassSeqAmp.gain.linearRampToValueAtTime(1, con.currentTime + 0.05);
+			leadSeqAmp.gain.linearRampToValueAtTime(1, con.currentTime + 0.05);
+			drumSeqAmp.gain.linearRampToValueAtTime(1, con.currentTime + 0.05);
+			playerMasterAmp.gain.linearRampToValueAtTime(1, con.currentTime + 0.005);
+		}
+		else if(playbackToggleBool === false){
+			bassSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.05);
+			leadSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.05);
+			drumSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.05);
+			//still got the players going, I think answer will be to plumb all of them into a master player amp!
+			playerMasterAmp.gain.linearRampToValueAtTime(0,con.currentTime + 0.005);
+		}
+	}
+
+	//freeze!
+	var playbackToggleBool = true;
+	//going to want an initpack
+	var playbackToggleButton = document.getElementById('freezeToggle');
+	playbackToggleBool
+	playbackToggleButton.onmousedown = function(){
+		playbackToggleBool = !playbackToggleBool;
+		console.log("Playback is now: " + playbackToggleBool);
+		socket.emit('transportOnChange',playbackToggleBool)
+		
+	}	
+	
+	
+	
+	
+	//show/hide elements
+	
+	//sequencers
+	var sequencersVisibleToggle = document.getElementById('sequencersVisibleToggleDiv');
+	var sequencersContainer = document.getElementById('sequencersMainDiv');
+	var sequencerVisibleBool = true;
+	function onSequencersVisibleToggleClick(){
+		sequencerVisibleBool = !sequencerVisibleBool;
+		if(sequencerVisibleBool === true){
+			sequencersContainer.style.display = 'block';
+		}
+		else {
+			sequencersContainer.style.display = 'none';
+		}
+	}
+	
+	//playercontroller
+	var controllerVisibleToggle = document.getElementById('controllerVisibleToggleDiv');
+	var controllerContainer = document.getElementById('controllerMainDiv');
+	var controllerVisibleBool = true;
+	function onControllerVisibleToggleClick(){
+		controllerVisibleBool = !controllerVisibleBool;
+		if(controllerVisibleBool === true){
+			controllerContainer.style.display = 'inline-block';
+		}
+		else {
+			controllerContainer.style.display = 'none';
+		}
+	}
+	
+	//chat
+	var chatVisibleToggle = document.getElementById('chatVisibleToggleDiv');
+	var chatContainer = document.getElementById('chat-divContainer');
+	var chatVisibleBool = true;
+	function onChatVisibleToggleClick(){
+		chatVisibleBool = !chatVisibleBool;
+		if(chatVisibleBool === true){
+			chatContainer.style.display = 'inline-block';
+		}
+		else {
+			chatContainer.style.display = 'none';
+		}
+	}
+	
+	
+	//waveType buttons
+	var gameDivSawtooth = document.getElementById('gameDiv-Sawtooth');
+	var gameDivSine = document.getElementById('gameDiv-Sine');
+	var gameDivSquare = document.getElementById('gameDiv-Square');
+	var gameDivTriangle = document.getElementById('gameDiv-Triangle');
+ 	
+	gameDivSawtooth.onmousedown = function(event){
+	emitWaveTypeChanged("sawtooth");
+	}
+	gameDivSine.onmousedown = function(event){
+	emitWaveTypeChanged("sine");
+}	
+	gameDivSquare.onmousedown = function(event){
+	emitWaveTypeChanged("square");
+	emitWaveTypeChanged("square");
+	}
+	gameDivTriangle.onmousedown = function(event){
+	emitWaveTypeChanged("triangle");
+	}
+	emitWaveTypeChanged = function(wave){
+	socket.emit('waveTypeChange',wave);
+	}
+	   
+	//legato and staccato for step sequencers
+	var leadStepSequencerDivLegatoButton = document.getElementById('leadStepSequencerLegatoButton');
+	var leadStepSequencerDivStaccatoButton = document.getElementById('leadStepSequencerStaccatoButton');
+	
+	var leadStepSequencerLegatoBool = false;
+	
+	leadStepSequencerDivLegatoButton.onmousedown = function(event)
+	{
+	leadStepSequencerLegatoBool = true;
+	emitLeadStepLegatoBoolChanged(leadStepSequencerLegatoBool);
+	}
+	leadStepSequencerDivStaccatoButton.onmousedown = function(event)
+	{
+	leadStepSequencerLegatoBool = false;
+	emitLeadStepLegatoBoolChanged(leadStepSequencerLegatoBool);
+	}
+	
+	emitLeadStepLegatoBoolChanged = function(state){
+	socket.emit('LeadStepLegatoBoolChange',state);
+	console.log("sending to server");
+	}
+	
+	var bassStepSequencerDivLegatoButton = document.getElementById('bassStepSequencerLegatoButton');
+	var bassStepSequencerDivStaccatoButton = document.getElementById('bassStepSequencerStaccatoButton');
+	
+	var bassStepSequencerLegatoBool = false;
+	
+	bassStepSequencerDivLegatoButton.onmousedown = function(event)
+	{
+	bassStepSequencerLegatoBool = true;
+	emitBassStepLegatoBoolChanged(bassStepSequencerLegatoBool);
+	}
+	bassStepSequencerDivStaccatoButton.onmousedown = function(event)
+	{
+	bassStepSequencerLegatoBool = false;
+	emitBassStepLegatoBoolChanged(bassStepSequencerLegatoBool);
+	}
+	
+	emitBassStepLegatoBoolChanged = function(state){
+	socket.emit('bassStepLegatoBoolChange',state);
+	console.log("sending to server");
+	}
+	
+	
+//needs to emit to server
+	var pianoKeyControls = new Nexus.Piano('#playerPianoNoteControlDiv');
+
+	var sliderKeyControls = new Nexus.Slider('#playerSliderNoteControlDiv',{
+    'size': [500,125],
+    'mode': 'absolute',  // 'relative' or 'absolute'
+    'min': 24,
+    'max': 59,
+    'step': 0,
+    'value': 0
+});
+		
+	
+	//keyboard
+	    playerControlSliderButton.onclick = function(){
+		    playerPianoNoteControlDiv.style.display = 'none';
+            playerSliderNoteControlDiv.style.display = 'inline-block';
+    }
+		playerControlPianoButton.onclick = function(){
+            playerSliderNoteControlDiv.style.display = 'none';
+			playerPianoNoteControlDiv.style.display = 'inline-block';
+	}
+	
+	sliderKeyControls.on('change',function(v){
+	socket.emit('noteChoice',v);
+	})
+
+	pianoKeyControls.on('change',function(v) {
+	socket.emit('noteChoice',v.note);
+	})
+   
+    chatForm.onsubmit = function(e){
+        e.preventDefault();
+        if(chatInput.value[0] === '/')
+            socket.emit('evalServer',chatInput.value.slice(1));
+        else
+            socket.emit('sendMsgToServer',chatInput.value);
+        chatInput.value = '';      
+    }
+	
+	//Game
+	
+	var playerParamPosition = new Nexus.Position('#playerPositionControl',{
+  'size': [400,400],
+  'mode': 'absolute',  // "absolute" or "relative"
+  'x': 0.5,  // initial x value
+  'minX': 0,
+  'maxX': 1,
+  'stepX': 0,
+  'y': 0.5,  // initial y value
+  'minY': 0,
+  'maxY': 1,
+  'stepY': 0
+})
+   
+   //make a lovely initpack
+	var Player = function(initpack) {
+	var self = {};
+	self.id = initpack.id;
+	self.number = initpack.number;
+	self.x = initpack.x;
+	self.y = initpack.y;
+	self.waveType = initpack.waveType;
+	self.currentNote = initpack.currentNote;
+	Player.list[self.id] = self;
+	return self;
+	}
+	Player.list = {};
+   
+	//init
+	//if something is CREATED On the server or locally?(I think?) e.g. oscillator, user
+	//Then from my understanding...
+	//it sends all the data to here, and if it doesn't match it tacks the new stuff on the end of the list?
+	socket.on('init',function(data){
+	    for(var i = 0 ; i < data.player.length; i++)
+		{
+			new Player(data.player[i]);
+			console.log("the Player ID from data.player is: " + data.player[i].id)
+			addThisToOsc(data.player[i].id);
+			MakeStepOscs();
+			//console.log("the Player ID from data.player is still: " + data.player[i].id)
+			//console.log("Here's the command I'm aiming ot get " + osc[data.player[i].id].frequency.value);
+		}
+		
+	});
+	
+	//update
+		//If something CHANGES, (player location, synth pitch, LFO speed, Amp volumes...) 
+		//only send that change (happens every frame, but only stuff that's different)
+	socket.on('update',function(data){
+		for(var i = 0; i < data.player.length; i++){
+			var pack = data.player[i];
+			var p = Player.list[pack.id];
+			if(p) {
+				if (pack.x !== undefined)
+						p.x = pack.x;
+					if (pack.y !== undefined)
+						p.y = pack.y;
+					if (pack.waveType !== undefined)
+						p.waveType = pack.waveType;
+					if (pack.waveType !== undefined)
+						p.currentNote = pack.currentNote;
+			}
+		}
+	});
+	//remove
+		//If something is GONE (player, dot, oscillator)
+		//Send ID
+	socket.on('remove', function(data){
+		for(var i = 0; i < data.player.length; i++){
+			console.log(data.player);
+			osc[data.player].stop();
+			delete Player.list[data.player[i]];
+		}
+
+	});
+	
+	//update loop
+	setInterval(function() {
+		for (var i in Player.list){
+		
+
+			//new stuff
+			//console.log(Player.list[i].currentNote);
+			osc[Player.list[i].id].frequency.value = Nexus.mtof(Player.list[i].currentNote) + 60;
+			amp[Player.list[i].id].gain.value = (Player.list[i].y / 200);
+			osc[Player.list[i].id].type = (Player.list[i].waveType);
+			
+			//the plan is eventually to route everything through, so that this is totally modular e.g. if player wants x to control an LFO or pitch?
+			//for now this will do. :)
+			//console.log(amp[Player.list[i].id].gain.value)
+		}
+		
+	},40);
+	
+
+playerParamPosition.on('change',function(v) {
+  //console.log(v);
+  socket.emit('playerPosChange',[v.x,v.y])
+})
+	
+
+	//gameDivSine
+	function addThisToOsc(thatID){
+		osc[thatID] = con.createOscillator();
+		osc[thatID].type = 'sine';
+		osc[thatID].frequency.value = Math.random() * 100 + 100;
+		osc[thatID].start();
+		
+		amp[thatID] = con.createGain();
+
+		amp[thatID].connect(playerMasterAmp);
+		amp[thatID].gain.value = 1;
+		osc[thatID].connect(amp[thatID]);
+		
+		console.log("amp printout is: " + amp[thatID].gain.value);
+		osc.push(osc[thatID]);
+		return osc;
+		//console.log("Did the ID make it here? " + thatID);
+		}
+
+var thereIsALeadStepOSC = false;
+var thereIsABassStepOSC = false;
+var thereIsADrumBuffer = false;
+		
+var bufferListG;		
+
+//Drum stuff
+function MakeStepOscs(){
+
+//custom wave stuff
+
+// lead
+leadSeqOsc = con.createOscillator();
+leadSeqOsc.frequency.value = 0;
+leadSeqAmp = con.createGain()
+leadSeqAmp.connect(con.destination);
+leadSeqOsc.connect(leadSeqAmp);
+leadSeqOsc.start();
+thereIsALeadStepOSC = true;
+
+//bass
+bassSeqOsc = con.createOscillator();
+bassSeqOsc.frequency.value = 0;
+bassSeqAmp = con.createGain()
+bassSeqAmp.connect(con.destination);
+bassSeqOsc.connect(bassSeqAmp);
+bassSeqOsc.start();
+thereIsABassStepOSC = true;
+
+
+//drum
+	//amp
+drumSeqAmp = con.createGain()
+drumSeqAmp.connect(con.destination);
+
+//getfile
+//<not mine but modified https://www.html5rocks.com/en/tutorials/webaudio/intro/> 
+var bufferLoader;
+
+  bufferLoader = new BufferLoader(
+    con,
+		[
+		  '../client/sounds/kick.wav',
+		  '../client/sounds/snare.wav',
+		  '../client/sounds/hihat.wav',
+		],
+    finishedLoading
+    );
+
+bufferLoader.load();
+
+//var bufferList;
+
+function finishedLoading(bufferList) {
+  // Create 3 sources and play them both together.
+  bufferListG = bufferList;
+  thereIsADrumBuffer = true;
+}}
+
+// </not mine but modified>
+
+
+//temporarily seq is local for testing
+var leadSeq = [
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 1, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+];
+var bassSeq = [
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 1, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+];	
+var drumSeq = [
+    [1, 0, 0, 0, 1, 1, 0, 0], 
+    [0, 0, 1, 0, 0, 0, 1, 0], 
+    [1, 1, 1, 1, 1, 1, 1, 1], 
+];	
+
+var leadSequencer = new Nexus.Sequencer('#leadStepSequencerUI',{
+ 'size': [400,200],
+ 'mode': 'toggle',
+ 'rows': 3,
+ 'columns': 8
+})
+var bassSequencer = new Nexus.Sequencer('#bassStepSequencerUI',{
+ 'size': [400,200],
+ 'mode': 'toggle',
+ 'rows': 3,
+ 'columns': 8
+})
+var drumSequencer = new Nexus.Sequencer('#drumStepSequencerUI',{
+ 'size': [400,200],
+ 'mode': 'toggle',
+ 'rows': 3,
+ 'columns': 8
+})
+
+/*
+seqInit();
+function seqInit()
+{
+console.log(sequencer)
+ sequencer.matrix.set.row(seq[0]);
+ sequencer.matrix.set.row(seq[1]);
+ sequencer.matrix.set.row(seq[2]);
+	}*/
+	
+socket.on('stepSent', function(step,now)
+	{{
+	//console.log(step);
+        if (leadSeq[0][step % leadSeq[0].length]){
+			playLeadSound(440);
+        }
+        
+        else if (leadSeq[1][step % leadSeq[1].length]){
+			playLeadSound(523.25);
+        }
+		else if (leadSeq[2][step % leadSeq[2].length]){
+			playLeadSound(659.25);
+		}
+		else {
+			playLeadSound(0);
+		}
+	}
+	{
+		if (bassSeq[0][step % bassSeq[0].length]){
+			playBassSound(130.81);
+        }
+        
+        else if (bassSeq[1][step % bassSeq[1].length]){
+			playBassSound(164.81);
+        }
+		else if (bassSeq[2][step % bassSeq[2].length]){
+		 playBassSound(196.00);
+		}
+		else {
+		playBassSound(0);
+		}
+	}
+	{
+		if(thereIsADrumBuffer !== true){
+		return;
+		}
+		 if (drumSeq[0][step % drumSeq[0].length]){
+			playDrumSound('kick');
+			
+        }
+        
+         if (drumSeq[1][step % drumSeq[1].length]){
+			playDrumSound('snare');
+        }
+		 if (drumSeq[2][step % drumSeq[2].length]){
+		 playDrumSound('hi-hat');
+		}
+		else {
+		return;
+		}
+	}
+	
+	})
+
+var timeoutID;
+
+socket.on('leadSeqLegatoBoolSent',function(data){
+leadStepSequencerLegatoBool = data;
+console.log(leadStepSequencerLegatoBool + " " + data);
+});
+socket.on('bassSeqLegatoBoolSent',function(data){
+bassStepSequencerLegatoBool = data;
+console.log(bassStepSequencerLegatoBool + " " + data);
+});
+
+function playLeadSound(freq) {
+
+	if(thereIsALeadStepOSC !== true){
+		return;
+	}
+	//console.log(freq);
+
+	if(freq !== 0){
+		leadSeqOsc.frequency.value = freq;
+	}
+	if(leadStepSequencerLegatoBool === false && freq !== 0){
+		leadSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.05);
+		leadSeqAmp.gain.linearRampToValueAtTime(0.7, con.currentTime + 0.1)
+	}
+	if(leadStepSequencerLegatoBool === true && leadSeqAmp.gain.value === 0){
+		leadSeqAmp.gain.linearRampToValueAtTime(0.7, con.currentTime + 0.1)
+	}
+
+	if(leadStepSequencerLegatoBool === false && freq === 0){
+		leadSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.1)
+	}
+}
+function playBassSound(freq) {
+
+	if(thereIsABassStepOSC !== true){
+		return;
+	}
+	//console.log(freq);
+
+	if(freq !== 0){
+		bassSeqOsc.frequency.value = freq;
+	}
+	if(bassStepSequencerLegatoBool === false && freq !== 0){
+		bassSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.05);
+		bassSeqAmp.gain.linearRampToValueAtTime(0.7, con.currentTime + 0.1)
+	}
+	if(bassStepSequencerLegatoBool === true && bassSeqAmp.gain.value === 0){
+		bassSeqAmp.gain.linearRampToValueAtTime(0.7, con.currentTime + 0.1)
+	}
+
+	if(bassStepSequencerLegatoBool === false && freq === 0){
+		bassSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.1)
+	}
+}
+
+
+function playDrumSound(drumHit) {
+
+	if(drumHit === 'kick'){
+		var kickPlayer = con.createBufferSource();
+		 kickPlayer.buffer = bufferListG[0];
+		 //kickPlayer.connect(drumSeqAmp);
+		 kickPlayer.connect(con.destination);
+		 
+		//console.log("kick: " + drumHit);
+		kickPlayer.start();
+	}
+	if(drumHit === 'snare'){
+		var snarePlayer = con.createBufferSource();
+		snarePlayer.buffer = bufferListG[1];
+		snarePlayer.connect(drumSeqAmp);
+
+		//console.log("snare: " + drumHit);
+		snarePlayer.start();
+	}
+	if(drumHit === 'hi-hat'){
+		var hihatPlayer = con.createBufferSource();
+		hihatPlayer.buffer = bufferListG[2];
+		hihatPlayer.connect(drumSeqAmp);
+	
+		//console.log("hi-hat: " + drumHit);
+		hihatPlayer.start();
+	}
+	
+}
+
+/*function slowAlert(freq) {
+leadSeqOsc.frequency.value = freq;
+bassSeqOsc.frequency.value = freq;
+}*/
+var newLeadAlreadyChanged = true;
+
+leadSequencer.on('change',function(v) {
+	if(newLeadAlreadyChanged === false){
+	if(v){
+		
+		if(v.state === true){
+			leadSeq[v.row][v.column] = 1;
+			
+		}
+		if(v.state === false){
+			leadSeq[v.row][v.column] = 0;
+		}
+		console.log("Lead Seq just changed: " + leadSeq[v.row][v.column]);
+		newLeadAlreadyChanged = true;
+	}
+	}
+})
+
+var newBassAlreadyChanged = true;
+bassSequencer.on('change',function(v) {
+	if(newBassAlreadyChanged === false){
+		if(v){		
+			if(v.state === true){
+				bassSeq[v.row][v.column] = 1;
+			}
+			if(v.state === false){
+				bassSeq[v.row][v.column] = 0;
+			}
+			console.log("Bass Seq just changed: " + bassSeq[v.row][v.column]);
+			newBassAlreadyChanged = true;
+		}
+	}
+})
+var newDrumAlreadyChanged = true;
+drumSequencer.on('change',function(v) {
+if(newDrumAlreadyChanged === false){
+		if(v){		
+			if(v.state === true){
+				drumSeq[v.row][v.column] = 1;
+			}
+			if(v.state === false){
+				drumSeq[v.row][v.column] = 0;
+			}
+			console.log("drum Seq just changed: " + drumSeq[v.row][v.column]);
+			newDrumAlreadyChanged = true;
+		}
+	}
+})
+
+	function onLeadSynthClick(){
+	socket.emit('leadSeqChanged', leadSeq);
+	console.log('sending to server: ' + leadSeq);
+	}
+	function onBassSynthClick(){
+	socket.emit('bassSeqChanged', bassSeq);
+	console.log('sending to server: ' + bassSeq);
+	}
+	function onDrumClick(){
+	socket.emit('drumSeqChanged', drumSeq);
+	console.log('sending to server: ' + drumSeq);
+	}
+
+socket.on('leadSeqFromServer', function(leadSeqUpdated)
+{	console.log("before: " + leadSeq);
+	console.log("after:  " + leadSeqUpdated);
+	leadSeq = leadSeqUpdated;
+	leadSequencer.columns = leadSeq[0].length;
+	leadSequencer.matrix.set.all(leadSeq);
+});
+socket.on('bassSeqFromServer', function(bassSeqUpdated)
+{
+	console.log("here bass" + bassSeqUpdated);
+	bassSeq = bassSeqUpdated;
+	bassSequencer.columns = bassSeq[0].length;
+	bassSequencer.matrix.set.all(bassSeq);
+});
+
+socket.on('drumSeqFromServer', function(drumSeqUpdated)
+{
+	console.log("here drum" + drumSeqUpdated);
+	drumSeq = drumSeqUpdated;
+	drumSequencer.columns = drumSeq[0].length;
+	drumSequencer.matrix.set.all(drumSeq);
+});
+
+//Timesigchange
+//take the existing array, copy it and add or take one to the length, overwrite the old one.
+
+leadAddColumnButton.onclick = function(){
+	
+	console.log("before: " + leadSeq[1]);
+	leadSeq[0].splice(1000,0,0);
+	leadSeq[1].splice(1000,0,0);
+	leadSeq[2].splice(1000,0,0);
+	console.log("after: " + leadSeq[1]);
+	newLeadAlreadyChanged = false;
+	onLeadSynthClick();
+}
+leadRemoveColumnButton.onclick = function(){
+	console.log("before: " + leadSeq[1]);
+	leadSeq[0].splice(-1,1);
+	leadSeq[1].splice(-1,1);
+	leadSeq[2].splice(-1,1);
+	console.log("after: " + leadSeq[1]);
+	newLeadAlreadyChanged = false;
+	onLeadSynthClick();
+}
+
+bassAddColumnButton.onclick = function(){
+	
+	console.log("before: " + bassSeq[1]);
+	bassSeq[0].splice(1000,0,0);
+	bassSeq[1].splice(1000,0,0);
+	bassSeq[2].splice(1000,0,0);
+	console.log("after: " + bassSeq[1]);
+	newBassAlreadyChanged = false;
+	onBassSynthClick();
+}
+bassRemoveColumnButton.onclick = function(){
+	console.log("before: " + bassSeq[1]);
+	bassSeq[0].splice(-1,1);
+	bassSeq[1].splice(-1,1);
+	bassSeq[2].splice(-1,1);
+	console.log("after: " + bassSeq[1]);
+	newBassAlreadyChanged = false;
+	onBassSynthClick();
+}
+
+drumAddColumnButton.onclick = function(){	
+	console.log("before: " + drumSeq[1]);
+	drumSeq[0].splice(1000,0,0);
+	drumSeq[1].splice(1000,0,0);
+	drumSeq[2].splice(1000,0,0);
+	console.log("after: " + drumSeq[1]);
+	newDrumAlreadyChanged = false;
+	onDrumClick();
+}
+drumRemoveColumnButton.onclick = function(){
+	console.log("before: " + drumSeq[1]);
+	drumSeq[0].splice(-1,1);
+	drumSeq[1].splice(-1,1);
+	drumSeq[2].splice(-1,1);
+	console.log("after: " + drumSeq[1]);
+	newDrumAlreadyChanged = false;
+	onDrumClick();
+}
+
+resetTimeSig.onclick = function(){
+
+	leadSeq[0].splice(-1,0,0,0,0,0,0,0,0,0,);
+	leadSeq[1].splice(-1,0,0,0,0,0,0,0,0,0,);
+	leadSeq[2].splice(-1,0,0,0,0,0,0,0,0,0,);
+	
+	bassSeq[0].splice(-1,0,0,0,0,0,0,0,0,0,);
+	bassSeq[1].splice(-1,0,0,0,0,0,0,0,0,0,);
+	bassSeq[2].splice(-1,0,0,0,0,0,0,0,0,0,);
+	
+	drumSeq[0].splice(-1,0,0,0,0,0,0,0,0,0,);
+	drumSeq[1].splice(-1,0,0,0,0,0,0,0,0,0,);
+	drumSeq[2].splice(-1,0,0,0,0,0,0,0,0,0,);
+	
+	leadSeq[0].splice(8);
+	leadSeq[1].splice(8);
+	leadSeq[2].splice(8);
+	
+	bassSeq[0].splice(8);
+	bassSeq[1].splice(8);
+	bassSeq[2].splice(8);
+	
+	drumSeq[0].splice(8);
+	drumSeq[1].splice(8);
+	drumSeq[2].splice(8);
+
+newLeadAlreadyChanged = false;
+newBassAlreadyChanged = false;
+newDrumAlreadyChanged = false;
+onLeadSynthClick();
+onBassSynthClick();
+onDrumClick();
+}
+
+
+//THIS IS NOT MINE source: https://www.html5rocks.com/en/tutorials/webaudio/intro/js/buffer-loader.js
+function BufferLoader(context, urlList, callback) {
+  this.context = context;
+  this.urlList = urlList;
+  this.onload = callback;
+  this.bufferList = new Array();
+  this.loadCount = 0;
+}
+
+BufferLoader.prototype.loadBuffer = function(url, index) {
+  // Load buffer asynchronously
+  var request = new XMLHttpRequest();
+  request.open("GET", url, true);
+  request.responseType = "arraybuffer";
+
+  var loader = this;
+
+  request.onload = function() {
+    // Asynchronously decode the audio file data in request.response
+    loader.context.decodeAudioData(
+      request.response,
+      function(buffer) {
+        if (!buffer) {
+          alert('error decoding file data: ' + url);
+          return;
+        }
+        loader.bufferList[index] = buffer;
+        if (++loader.loadCount == loader.urlList.length)
+          loader.onload(loader.bufferList);
+      },
+      function(error) {
+        console.error('decodeAudioData error', error);
+      }
+    );
+  }
+
+  request.onerror = function() {
+    alert('BufferLoader: XHR error');
+  }
+
+  request.send();
+}
+
+BufferLoader.prototype.load = function() {
+  for (var i = 0; i < this.urlList.length; ++i)
+  this.loadBuffer(this.urlList[i], i);
+}
+
+   
+</script>

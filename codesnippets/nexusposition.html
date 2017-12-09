@@ -1,0 +1,14 @@
+<html>
+	<body>
+		<div id="position1"></div>
+<script src="https://rawgit.com/nexus-js/ui/master/dist/NexusUI.js"></script>
+	<script>
+		var position = new Nexus.Position('#position1');
+
+position.on('change',function(v) {
+  console.log(v);
+})
+		
+	</script>
+	</body>    
+</html>

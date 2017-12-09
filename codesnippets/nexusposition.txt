@@ -1,0 +1,15 @@
+<html>
+	<body>
+		<div id="playerPositionControl"></div>
+
+	<script>
+		var playerPositionControlNexus = new Nexus.Position('#playerPositionControl');
+
+		playerPositionControlNexus.on('release',function(v) {
+		console.log(v);
+			//socket.emit('keyPress',{x:event.x, y:event.y});
+		})
+		
+	</script>
+	</body>    
+</html>

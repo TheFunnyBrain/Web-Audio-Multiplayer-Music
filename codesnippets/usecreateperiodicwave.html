@@ -1,0 +1,39 @@
+
+<body>
+<div id=oscilloscopeDiv></div>
+<script src="https://rawgit.com/nexus-js/ui/master/dist/NexusUI.js"></script>
+<script>
+//var real = new Float32Array(2);
+//var imag = new Float32Array(2);
+var ac = new AudioContext();
+Nexus.context = ac;
+var osc = ac.createOscillator();
+
+var oscilloscope = new Nexus.Oscilloscope('#oscilloscopeDiv',{'size': [1000,150]});
+
+var sawtooth = ac.createOscillator()
+sawtooth.type = 'sawtooth';
+sawtooth.frequency.value = 440;
+sawtooth.connect(ac.destination);
+oscilloscope.connect(sawtooth);
+sawtooth.start();
+sawtooth.stop(2);
+
+//oscilloscope.connect(osc);
+const imag = Array.from({ length: 8192 }, (_, n) => (
+  n === 0 ?
+  0 :
+Math.pow (-1, n + 1) * (2 / (n * Math.PI))
+  
+  
+));
+const real = imag.map(() => 0);
+var wave = ac.createPeriodicWave(real, imag, {disableNormalization: true});
+osc.setPeriodicWave(wave);
+osc.frequency.value = 20;
+osc.connect(ac.destination);
+//osc.start();
+//osc.stop(2);
+</script>
+</body>
+</html>
