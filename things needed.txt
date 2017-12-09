@@ -1,0 +1,4 @@
+This project uses MongoDB, a Node.JS server & a web audio-friendly browser
+
+The mongo server was set up using this video:
+https://youtu.be/E-YYRLQSVDI
