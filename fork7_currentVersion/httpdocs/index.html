@@ -1,0 +1,1265 @@
+<head>
+	<style>
+
+		.tooltip {
+			position: relative;
+			display: inline-block;
+			border-bottom: 1px dotted white;
+			background-color:black;
+			color: white;
+		}
+
+		.tooltip .tooltiptext {
+			visibility: hidden;
+			width: 300px;
+			background-color: black;
+			color: #fff;
+			border-radius: 6px;
+			padding: 5px 0;
+			position: absolute;
+			z-index: 1;
+			margin-left: -60px;
+		}
+
+		.tooltip .tooltiptext::after {
+			content: "";
+			position: absolute;
+			top: 100%;
+			left: 50%;
+			margin-left: -5px;
+			border-width: 5px;
+			border-style: solid;
+			border-color: black transparent transparent transparent;
+		}
+
+		.tooltip:hover .tooltiptext {
+			visibility: visible;
+		}
+
+	</style>
+</head>
+<div style="background-color:orange"><h1>Music Maker!</h1></div>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script src="https://rawgit.com/nexus-js/ui/master/dist/NexusUI.js"></script>
+<div id="signDiv">
+	<h2>Welcome to the Music maker! Please press the button below to get started...</h2>
+    <button id="signDiv-signIn">Click me to make music!</button>
+</div>
+ 
+<div id="mainPlayerDiv" style="display:none;margin:auto;">
+
+	<div id="sequencersContainerDiv" style="border:solid;display:inline-block; width:75%">
+	<div id="sequencersVisibleToggleDiv" style="background-color:orange" onclick="onSequencersVisibleToggleClick()"><h2>Sequencers (tap here to show/hide)</h2></div>
+	<div id="sequencersMainDiv" style="display:inline-block">
+	<div id="leadStepSequencerMainDiv"style="display:inline-block;border:solid">
+		<h3>Lead Synth</h3>
+
+		<div id="leadStepSequencerUI" onclick="onLeadSynthClick()">
+		</div>
+		<div id="leadSequencerButtons">
+			<div>
+			<!--These don't work currently
+			<button id="removeStepColumn">Remove Column</button>
+			<button id="addStepColumn">Add Column</button>-->
+			</div>
+			<div>
+			<button id="leadStepSequencerLegatoButton">Legato</button>
+			<button id="leadStepSequencerStaccatoButton">Staccato</button>
+			<button id="leadAddColumnButton">Add Column</button>
+			<button id="leadRemoveColumnButton">Remove Column</button>
+			</div>
+		</div>
+	</div>
+	
+	<div id="bassStepSequencerMainDiv" style="display:inline-block;border:solid">
+		<h3>Bass Synth</h3>
+
+		<div id="bassStepSequencerUI" onclick="onBassSynthClick()">
+		</div>
+		<div id="bassSequencerButtons">
+			<div>
+				<button id="bassStepSequencerLegatoButton">Legato</button>
+				<button id="bassStepSequencerStaccatoButton">Staccato</button>
+				<button id="bassAddColumnButton">Add Column</button>
+				<button id="bassRemoveColumnButton">Remove Column</button>
+			</div>
+		</div>
+	</div>
+	<div id="drumStepSequencerMainDiv" style="display:inline-block;border:solid">
+		<h3>Drums</h3>
+
+		<div id="drumStepSequencerUI" onclick="onDrumClick()">
+		</div>
+		<div id="drumSequencerButtons">
+			<div>
+			<button id="drumAddColumnButton">Add Column</button>
+			<button id="drumRemoveColumnButton">Remove Column</button>
+			<!--These don't work currently
+			<button id="removeStepColumn">Remove Column</button>
+			<button id="addStepColumn">Add Column</button>-->
+			</div>
+		</div>
+	</div>
+
+	</div>
+
+	</div>
+	<div id ="transport" style="display:inline-block; border:solid;text-align:center">
+		<div id="tempoSlider" style="inline-block"></div>
+		Tempo
+		<button id="playbackToggle">Play/pause</button>
+		<button id="resetTimeSig">Reset Time Sig</button>
+		
+	</div>
+	<div id="controllerContainerDiv" style="border:solid;display:inline-block;width:45%">
+	<div id="controllerVisibleToggleDiv" style="background-color:orange" onclick="onControllerVisibleToggleClick()"><h2>Your Instrument - Click here to show/hide</h2></div>
+	<div id="controllerMainDiv"style="background-color:grey;display:inline-block">
+		<h3>Your very own musical instrument!</h3>
+		<div id="playerPianoNoteControlDiv">
+		</div>
+		<div id="playerSliderNoteControlDiv" style="display:none;">
+		</div>
+		<br>
+		
+		<div id="playerNoteInterfaceButtons">
+
+		<button id="playerControlPianoButton">Piano</button>
+		<button id="playerControlSliderButton">Slider</button>
+			<div class="tooltip">??
+				<span class="tooltiptext">
+					<ul>
+						<li>Piano: Touch the keys to play notes. Silent when not played.</li>
+						<li>Slider: Touch the line to play notes, this lets you sweep up and down notes. Rings out forever.</li>
+					</ul>
+				</span>
+			</div>
+		</div>
+
+	<div id="waveTypeButtons">
+		<button id="gameDiv-Sawtooth">Sawtooth</button>
+		<button id="gameDiv-Sine">Sine</button>
+		<button id="gameDiv-Square">Square</button>
+		<button id="gameDiv-Triangle">Triangle</button>
+		<div class="tooltip">??
+			<span class="tooltiptext">
+				<ul>
+					<li>Sawtooth: A buzzy sound.</li>
+					<li>Sine: A beepy sound.</li>
+					<li>Square: A roboty sound.</li>
+					<li>Triangle: Like a sine, but rougher.</li>
+				</ul>
+			</span>
+		</div>
+	</div>
+
+	</div>
+		<div id="effectsContainer" style="display:inline-block">
+	<div>
+		<div id="noEffect1TextButton"></div>
+		<div id="delayTextButton"></div>
+	</div>
+	<div id="myVolumeSlider" style="display:inline-block"></div>
+</div>
+</div>
+
+<div style="display:inline-block; width:45%; vertical-align: top;;height:320px">
+<div id="chatVisibleToggleDiv" style="background-color:orange; width:100%" onclick="onChatVisibleToggleClick()"><h2>Chat box - Click here to show/hide</h2></div>
+<br>
+<div id="chat-divContainer" style="display:inline-block;width:100%">
+	<div id="chat-text" style="width:100%;height:200px;overflow-y:scroll">
+		<div>You're in! Please do say hello! :)</div>
+	</div>
+
+	<form id="chat-form">
+		<input id="chat-input" type="text" style="width:100%"></input>
+	</form>
+</div>
+</div>
+<script>
+
+
+	//Web Audio Setting up
+	var audio_context = window.AudioContext || window.webkitAudioContext;
+	var con = new audio_context();
+	
+		var tempo = 300;
+	//TRYING A THING
+	var osc = [];
+	osc.id = [];
+	var amp = [];
+	var effect1 = [];
+	var effect2 = [];
+	
+	var effect1Current = [];
+	var effect2Current = [];
+	
+	
+	//TESTING
+	var playerMasterAmp = con.createGain();
+	playerMasterAmp.connect(con.destination);
+	playerMasterAmp.gain.value = 1;
+	
+	//for now eveything is going to con.destination rwithout a gain or anything nice - Adam should expect clipping in intial versions, it might get loud!
+
+	//Everything node based
+	var socket = io();
+
+	//sign
+	var signDiv = document.getElementById('signDiv');
+	var signDivUsername = document.getElementById('signDiv-username');
+	var signDivSignIn = document.getElementById('signDiv-signIn');
+	var signDivSignUp = document.getElementById('signDiv-signUp');
+	var signDivPassword = document.getElementById('signDiv-password');
+   
+    signDivSignIn.onclick = function(){
+        socket.emit('signIn',{username:"value",password:"value"});
+    }
+
+    socket.on('signInResponse',function(data){
+        if(data.success){
+            signDiv.style.display = 'none';
+            mainPlayerDiv.style.display = 'inline-block';
+        } else
+            alert("Sign in unsuccessul.");
+    });
+    socket.on('signUpResponse',function(data){
+        if(data.success){
+            alert("Sign up successul.");
+        } else
+            alert("Sign up unsuccessul.");
+    });
+ 
+    //chat
+    var chatText = document.getElementById('chat-text');
+    var chatInput = document.getElementById('chat-input');
+    var chatForm = document.getElementById('chat-form');
+
+   
+    socket.on('addToChat',function(data){
+        chatText.innerHTML += '<div>' + data + '</div>';
+    });
+    socket.on('evalAnswer',function(data){
+        console.log(data);
+    });
+	
+var osc = [];
+	
+	//Transport Toggle
+		var playbackToggleBool = true;
+	//going to want an initpack
+	
+	var playbackToggleButton = document.getElementById('playbackToggle');
+	
+	
+	
+	playbackToggleButton.onmousedown = function(){
+		playbackToggleBool = !playbackToggleBool;
+		//console.log("Playback is now: " + playbackToggleBool);
+		socket.emit('transportOnChange',playbackToggleBool)
+		if(playbackToggleBool === true){
+			bassSeqAmp.gain.linearRampToValueAtTime(1, con.currentTime + 0.05);
+			leadSeqAmp.gain.linearRampToValueAtTime(1, con.currentTime + 0.05);
+			drumSeqAmp.gain.linearRampToValueAtTime(1, con.currentTime + 0.05);
+			playerMasterAmp.gain.linearRampToValueAtTime(1, con.currentTime + 0.005);
+		}
+		else if(playbackToggleBool === false){
+			bassSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.05);
+			leadSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.05);
+			drumSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.05);
+			//still got the players going, I think answer will be to plumb all of them into a master player amp!
+			playerMasterAmp.gain.linearRampToValueAtTime(0,con.currentTime + 0.005);
+		}
+	}
+
+	//freeze!
+	var playbackToggleBool = true;
+	//going to want an initpack
+	var playbackToggleButton = document.getElementById('playbackToggle');
+	playbackToggleButton.onmousedown = function(){
+		//console.log("Playback is now: " );
+		console.log("Playback is now hopefully: " + !playbackToggleBool);
+		socket.emit('transportOnChange', !playbackToggleBool)
+		
+	}	
+	socket.on('transportOnStatus', function(data){
+		if(data === true){
+			console.log(true);
+			playbackToggleBool = data;
+			console.log(tempo);
+			leadSequencer.start(tempo);
+			bassSequencer.start(tempo);
+			drumSequencer.start(tempo);
+			playerMasterAmp.gain.linearRampToValueAtTime(1,con.currentTime + 0.005);
+		}
+		else if(data === false){
+			playbackToggleBool = data;
+			//console.log(playbackToggleBool);
+			leadSequencer.stop();
+			bassSequencer.stop();
+			drumSequencer.stop();
+			playerMasterAmp.gain.linearRampToValueAtTime(0,con.currentTime + 0.005);
+		}
+	
+	})
+	tempoVarSlider = new Nexus.Slider('#tempoSlider', {
+		'size':[20,120],
+		'min': 214,
+		'max':500}
+	);
+	
+	tempoVarSlider.on('change', function(e){
+	console.log(e);
+		
+		socket.emit('tempoChange', e)
+	});
+	socket.on('receiveTempoChange', function(data){
+		tempo = data;
+		console.log(data)
+		leadSequencer.stop();
+		leadSequencer.start(tempo);
+		bassSequencer.stop();
+		bassSequencer.start(tempo);
+		drumSequencer.stop();
+		drumSequencer.start(tempo);
+	})
+	
+	//show/hide elements
+	
+	//sequencers
+	var sequencersVisibleToggle = document.getElementById('sequencersVisibleToggleDiv');
+	var sequencersContainer = document.getElementById('sequencersMainDiv');
+	var sequencerVisibleBool = true;
+	function onSequencersVisibleToggleClick(){
+		sequencerVisibleBool = !sequencerVisibleBool;
+		if(sequencerVisibleBool === true){
+			sequencersContainer.style.display = 'block';
+		}
+		else {
+			sequencersContainer.style.display = 'none';
+		}
+	}
+	
+	//playercontroller
+	var controllerVisibleToggle = document.getElementById('controllerVisibleToggleDiv');
+	var controllerContainer = document.getElementById('controllerMainDiv');
+	var controllerVisibleBool = true;
+	function onControllerVisibleToggleClick(){
+		controllerVisibleBool = !controllerVisibleBool;
+		if(controllerVisibleBool === true){
+			controllerContainer.style.display = 'inline-block';
+		}
+		else {
+			controllerContainer.style.display = 'none';
+		}
+	}
+	
+	//chat
+	var chatVisibleToggle = document.getElementById('chatVisibleToggleDiv');
+	var chatContainer = document.getElementById('chat-divContainer');
+	var chatVisibleBool = true;
+	function onChatVisibleToggleClick(){
+		chatVisibleBool = !chatVisibleBool;
+		if(chatVisibleBool === true){
+			chatContainer.style.display = 'inline-block';
+		}
+		else {
+			chatContainer.style.display = 'none';
+		}
+	}
+	
+	// Effects interaction
+	var noEffect1TextButtonDiv = new Nexus.TextButton('#noEffect1TextButton',{
+    'size': [150,50],
+    'state': false,
+    'text': 'No Effect',
+    'alternate': false
+});
+
+noEffect1TextButtonDiv.on('change', function(){
+	var newEffectsString = "gain";
+	socket.emit('effect1Choice', newEffectsString);
+	console.log("sending to server");
+	});
+	
+	var delayTextButtonDiv = new Nexus.TextButton('#delayTextButton',{
+    'size': [150,50],
+    'state': false,
+    'text': 'Delay',
+    'alternate': false
+});
+
+delayTextButtonDiv.on('change', function(){
+	var newEffectsString = "delay";
+	socket.emit('effect1Choice', newEffectsString);
+	console.log("sending to server");
+	});
+	
+	
+	
+	
+	
+	
+	//waveType buttons
+	var gameDivSawtooth = document.getElementById('gameDiv-Sawtooth');
+	var gameDivSine = document.getElementById('gameDiv-Sine');
+	var gameDivSquare = document.getElementById('gameDiv-Square');
+	var gameDivTriangle = document.getElementById('gameDiv-Triangle');
+ 	
+	gameDivSawtooth.onmousedown = function(event){
+	emitWaveTypeChanged("sawtooth");
+	}
+	gameDivSine.onmousedown = function(event){
+	emitWaveTypeChanged("sine");
+}	
+	gameDivSquare.onmousedown = function(event){
+	emitWaveTypeChanged("square");
+	emitWaveTypeChanged("square");
+	}
+	gameDivTriangle.onmousedown = function(event){
+	emitWaveTypeChanged("triangle");
+	}
+	emitWaveTypeChanged = function(wave){
+	socket.emit('waveTypeChange',wave);
+	}
+	   
+	//legato and staccato for step sequencers
+	var leadStepSequencerDivLegatoButton = document.getElementById('leadStepSequencerLegatoButton');
+	var leadStepSequencerDivStaccatoButton = document.getElementById('leadStepSequencerStaccatoButton');
+	
+	var leadStepSequencerLegatoBool = false;
+	
+	leadStepSequencerDivLegatoButton.onmousedown = function(event)
+	{
+	leadStepSequencerLegatoBool = true;
+	emitLeadStepLegatoBoolChanged(leadStepSequencerLegatoBool);
+	}
+	leadStepSequencerDivStaccatoButton.onmousedown = function(event)
+	{
+	leadStepSequencerLegatoBool = false;
+	emitLeadStepLegatoBoolChanged(leadStepSequencerLegatoBool);
+	}
+	
+	emitLeadStepLegatoBoolChanged = function(state){
+	socket.emit('LeadStepLegatoBoolChange',state);
+	console.log("sending to server");
+	}
+	
+	var bassStepSequencerDivLegatoButton = document.getElementById('bassStepSequencerLegatoButton');
+	var bassStepSequencerDivStaccatoButton = document.getElementById('bassStepSequencerStaccatoButton');
+	
+	var bassStepSequencerLegatoBool = false;
+	
+	bassStepSequencerDivLegatoButton.onmousedown = function(event)
+	{
+	bassStepSequencerLegatoBool = true;
+	emitBassStepLegatoBoolChanged(bassStepSequencerLegatoBool);
+	}
+	bassStepSequencerDivStaccatoButton.onmousedown = function(event)
+	{
+	bassStepSequencerLegatoBool = false;
+	emitBassStepLegatoBoolChanged(bassStepSequencerLegatoBool);
+	}
+	
+	emitBassStepLegatoBoolChanged = function(state){
+	socket.emit('bassStepLegatoBoolChange',state);
+	console.log("sending to server");
+	}
+	
+	
+//needs to emit to server
+	var pianoKeyControls = new Nexus.Piano('#playerPianoNoteControlDiv');
+
+	var sliderKeyControls = new Nexus.Slider('#playerSliderNoteControlDiv',{
+    'size': [500,125],
+    'mode': 'absolute',  // 'relative' or 'absolute'
+    'min': 24,
+    'max': 59,
+    'step': 0,
+    'value': 0
+});
+		
+	
+	//keyboard
+	    playerControlSliderButton.onclick = function(){
+		    playerPianoNoteControlDiv.style.display = 'none';
+            playerSliderNoteControlDiv.style.display = 'inline-block';
+    }
+		playerControlPianoButton.onclick = function(){
+            playerSliderNoteControlDiv.style.display = 'none';
+			playerPianoNoteControlDiv.style.display = 'inline-block';
+	}
+	
+	
+	var volumeSlide = new Nexus.Slider('#myVolumeSlider',{'min': 0, 'max':0.7, 'size': [20,120],'mode':'absolute','value':0.4});
+	volumeSlide.on('change',function(v) {
+	socket.emit('volumeChoice',v);
+	console.log(volumeSlide.value);
+	})
+	
+	sliderKeyControls.on('change',function(v){
+	socket.emit('noteChoice',v);
+	socket.emit('volumeChoice', volumeSlide.value);
+	})
+
+	pianoKeyControls.on('change',function(v) {
+	socket.emit('noteChoice',v.note);
+	if(v.state === true){
+	console.log();
+		socket.emit('volumeChoice', volumeSlide.value)
+	}
+	else if(v.state === false){
+		socket.emit('volumeChoice', 0)
+	}
+	})
+
+
+   
+    chatForm.onsubmit = function(e){
+        e.preventDefault();
+        if(chatInput.value[0] === '/')
+            socket.emit('evalServer',chatInput.value.slice(1));
+        else
+            socket.emit('sendMsgToServer',chatInput.value);
+        chatInput.value = '';      
+    }
+	
+	//Game
+	
+
+   
+   //make a lovely initpack
+	var Player = function(initpack) {
+	var self = {};
+	self.id = initpack.id;
+	self.number = initpack.number;
+	self.x = initpack.x;
+	self.y = initpack.y;
+	self.waveType = initpack.waveType;
+	self.currentNote = initpack.currentNote;
+	self.effect1String = initpack.effect1String;
+	self.effect2String = initpack.effect2String;
+	self.currentVolume = initpack.currentVolume;
+	Player.list[self.id] = self;
+	return self;
+	}
+	Player.list = {};
+   
+	//init
+	//if something is CREATED On the server or locally?(I think?) e.g. oscillator, user
+	//Then from my understanding...
+	//it sends all the data to here, and if it doesn't match it tacks the new stuff on the end of the list?
+	socket.on('init',function(data){
+	    for(var i = 0 ; i < data.player.length; i++)
+		{
+			
+			new Player(data.player[i]);
+			console.log(data.player[i]);
+			console.log("the Player ID from data.player is: " + data.player[i].id)
+			addThisToOsc(data.player[i].id);
+			MakeStepOscs();
+			//console.log("the Player ID from data.player is still: " + data.player[i].id)
+			//console.log("Here's the command I'm aiming ot get " + osc[data.player[i].id].frequency.value);
+		}
+		
+	});
+	
+	//update
+		//If something CHANGES, (player location, synth pitch, LFO speed, Amp volumes...) 
+		//only send that change (happens every frame, but only stuff that's different)
+	socket.on('update',function(data){
+		for(var i = 0; i < data.player.length; i++){
+			var pack = data.player[i];
+			var p = Player.list[pack.id];
+			if(p) {
+				if (pack.x !== undefined)
+						p.x = pack.x;
+					if (pack.y !== undefined)
+						p.y = pack.y;
+					if (pack.waveType !== undefined)
+						p.waveType = pack.waveType;
+					if (pack.waveType !== undefined)
+						p.currentNote = pack.currentNote;
+					if (pack.effect1String !== undefined);
+						p.effect1String = pack.effect1String;
+					if (pack.effect2String !== undefined);
+						p.effect2String = pack.effect2String;
+					if (pack.currentVolume !== undefined);
+						p.currentVolume = pack.currentVolume;
+			}
+		}
+	});
+	//remove
+		//If something is GONE (player, dot, oscillator)
+		//Send ID
+	socket.on('remove', function(data){
+		for(var i = 0; i < data.player.length; i++){
+			console.log(data);
+			console.log(osc);
+			if(typeof data.player !== 'undefined'){
+			//osc[Player.list[data.player].stop();
+			}
+			delete Player.list[data.player[i]];
+		}
+
+	});
+	var effect1delay = [];
+	//update loop
+	setInterval(function() {
+		for (var i in Player.list){
+		
+
+			//new stuff
+			//console.log(Player.list[i].currentNote);
+			osc[Player.list[i].id].frequency.value = Nexus.mtof(Player.list[i].currentNote) + 60;
+			amp[Player.list[i].id].gain.value = (Player.list[i].currentVolume);
+			osc[Player.list[i].id].type = (Player.list[i].waveType);
+			
+			if(Player.list[i].effect1String != effect1Current[Player.list[i].id]){
+				console.log("playerlist new string: " + Player.list[i].effect1String + " Current string: " + effect1Current[Player.list[i].id] + " NOT MATCHED");
+				effect1Current[Player.list[i].id] = Player.list[i].effect1String;
+				console.log(effect1Current[Player.list[i].id]);
+				if(effect1Current[Player.list[i].id] === "gain"){
+					effect1[Player.list[i].id] = con.createGain();
+					osc[Player.list[i].id].connect(effect1[Player.list[i].id]);
+					effect1[Player.list[i].id].connect(effect2[Player.list[i].id]);
+					console.log(effect1[Player.list[i].id]);
+				}
+				else if(effect1Current[Player.list[i].id] === "delay")
+				{
+					effect1[Player.list[i].id] = con.createGain();
+					osc[Player.list[i].id].connect(effect1[Player.list[i].id]);
+					effect1[Player.list[i].id].connect(effect2[Player.list[i].id]);
+					effect1delay[Player.list[i].id] = con.createDelay();
+					effect1delay[Player.list[i].id].delayTime = 500;
+					effect1delay[Player.list[i].id].connect(effect1[Player.list[i].id]);
+					console.log(effect1delay[Player.list[i].id]);
+				}
+			}
+			
+			//the plan is eventually to route everything through, so that this is totally modular e.g. if player wants x to control an LFO or pitch?
+			//for now this will do. :)
+			//console.log(amp[Player.list[i].id].gain.value)
+		}
+		
+	},40);
+	
+
+	
+
+	//gameDivSine
+	function addThisToOsc(thatID){
+		osc[thatID] = con.createOscillator();
+		osc[thatID].type = 'sine';
+		osc[thatID].frequency.value = Math.random() * 100 + 100;
+		osc[thatID].start();
+		
+		amp[thatID] = con.createGain();
+
+		amp[thatID].connect(playerMasterAmp);
+		amp[thatID].gain.value = 0.7;
+
+		
+		//these are.... effects hopefully - they start life as gain nodes, and will hopefully be repurposed
+		effect1[thatID] = con.createGain();
+		osc[thatID].connect(effect1[thatID]);
+		effect2[thatID] = con.createGain();
+		effect1[thatID].connect(effect2[thatID]);
+		effect2[thatID].connect(amp[thatID]);
+		
+		effect1Current[thatID]="gain";
+		effect2Current[thatID]="gain";
+		
+		console.log("amp printout is: " + amp[thatID].gain.value);
+		osc.push(osc[thatID]);
+		return osc;
+		//console.log("Did the ID make it here? " + thatID);
+		}
+
+var thereIsALeadStepOSC = false;
+var thereIsABassStepOSC = false;
+var thereIsADrumBuffer = false;
+		
+var bufferListG;		
+
+//Drum stuff
+function MakeStepOscs(){
+
+//custom wave stuff
+
+// lead
+leadSeqOsc = con.createOscillator();
+leadSeqOsc.frequency.value = 0;
+leadSeqAmp = con.createGain()
+leadSeqAmp.connect(con.destination);
+leadSeqOsc.connect(leadSeqAmp);
+leadSeqOsc.start();
+thereIsALeadStepOSC = true;
+
+//bass
+bassSeqOsc = con.createOscillator();
+bassSeqOsc.frequency.value = 0;
+bassSeqAmp = con.createGain()
+bassSeqAmp.connect(con.destination);
+bassSeqOsc.connect(bassSeqAmp);
+bassSeqOsc.start();
+thereIsABassStepOSC = true;
+
+
+//drum
+	//amp
+drumSeqAmp = con.createGain()
+drumSeqAmp.connect(con.destination);
+
+
+//DRUM NOTES https://sonoport.github.io/synthesising-sounds-webaudio.html and https://dev.opera.com/articles/drum-sounds-webaudio/ gave a lot of inspiration
+function Kick(context) {
+	this.context = con;
+};
+
+kickSetup = function() {
+	var kickOsc = this.con.createOscillator();
+	var kickGain = this.con.createGain();
+	kickOsc.connect(kickGain);
+	kickGain.connect(con.destination)
+};
+kickSetup();
+kickTrigger = function() {
+	var kickOsc = con.createOscillator();
+	var kickGain = con.createGain();
+	kickOsc.connect(kickGain);
+	kickGain.connect(con.destination)
+
+	kickOsc.frequency.value = 150;
+	kickGain.gain.setValueAtTime(1, 0.01);
+
+	kickOsc.frequency.exponentialRampToValueAtTime(0.01, con.currentTime + 0.5);
+	kickGain.gain.exponentialRampToValueAtTime(0.01, con.currentTime + 0.5);
+	kickOsc.start();
+	kickOsc.stop(con.currentTime + 0.5);
+};
+
+
+
+
+snareTrigger = function(){
+
+var snareFilter = con.createBiquadFilter();
+    snareFilter.type = "highpass";
+    snareFilter.frequency.setValueAtTime(100, con.currentTime);
+    snareFilter.frequency.linearRampToValueAtTime(1000, con.currentTime + 0.2);
+	var snareGain = con.createGain();
+	//noise buffer 
+	    var node = con.createBufferSource(),
+        buffer = con.createBuffer(1, 4096, con.sampleRate),
+        data = buffer.getChannelData(0);
+
+    for (var i = 0; i < 4096; i++) {
+
+        data[i] = Math.random();
+    }
+
+    node.buffer = buffer;
+    node.loop = true;
+    node.start(con.currentTime);
+    node.stop(con.currentTime + 0.2);
+	var nodeGain = con.createGain();
+    node.connect(nodeGain);
+	nodeGain.connect(snareFilter);
+	snareFilter.connect(snareGain);
+	///
+	var snareOsc = con.createOscillator();
+	snareOsc.type = "triangle";
+	snareOsc.frequency.value = 100;
+	snareOsc.start();
+	snareOsc.stop(con.currentTime + 0.1)
+	snareOsc.connect(snareGain);
+	snareGain.gain.setValueAtTime(1, 0.01);
+	snareGain.gain.exponentialRampToValueAtTime(0.01, con.currentTime + 0.5);
+	snareGain.connect(con.destination);
+}
+// The hat code is a copy of https://sonoport.github.io/synthesising-sounds-webaudio.html and https://dev.opera.com/articles/drum-sounds-webaudio/ as I like the sound it creates.
+hihatTrigger = function(){
+
+    var gainOsc4 = con.createGain();
+    var fundamental = 40;
+    var ratios = [2, 3, 4.16, 5.43, 6.79, 8.21];
+
+    var bandpass = con.createBiquadFilter();
+    bandpass.type = "bandpass";
+    bandpass.frequency.value = 10000;
+
+    var highpass = con.createBiquadFilter();
+    highpass.type = "highpass";
+    highpass.frequency.value = 7000;
+
+
+    ratios.forEach(function(ratio) {
+
+        var osc4 = con.createOscillator();
+        osc4.type = "square";
+        osc4.frequency.value = fundamental * ratio;
+        osc4.connect(bandpass);
+
+        osc4.start(con.currentTime);
+        osc4.stop(con.currentTime + 0.05);
+        
+    });
+
+    gainOsc4.gain.setValueAtTime(1, con.currentTime);
+    gainOsc4.gain.exponentialRampToValueAtTime(0.01, con.currentTime + 0.05);
+    
+    bandpass.connect(highpass);
+    highpass.connect(gainOsc4);
+    gainOsc4.connect(con.destination);
+    
+
+};
+
+}
+
+
+
+//temporarily seq is local for testing
+var leadSeq = [
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 1, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+];
+var bassSeq = [
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 1, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0], 
+];	
+var drumSeq = [
+    [1, 0, 0, 0, 1, 1, 0, 0], 
+    [0, 0, 1, 0, 0, 0, 1, 0], 
+    [1, 1, 1, 1, 1, 1, 1, 1], 
+];	
+
+var leadSequencer = new Nexus.Sequencer('#leadStepSequencerUI',{
+ 'size': [400,200],
+ 'mode': 'toggle',
+ 'rows': 8,
+ 'columns': 8
+})
+var leadnote= 440
+leadSequencer.start(tempo);
+leadSequencer.on('step',function(v) {
+
+        if (v[0]){
+			playLeadSound(440);
+        }
+        
+        else if (v[1]){
+			playLeadSound(leadnote * 1.125);
+        }
+		else if (v[2]){
+			playLeadSound(leadnote * 1.25);
+		}
+        
+        else if (v[3]){
+			playLeadSound(leadnote * 1.333);
+        }
+		else if (v[4]){
+			playLeadSound(leadnote * 1.5);
+		}
+        else if (v[5]){
+			playLeadSound(leadnote * 1.666);
+        }
+		else if (v[6]){
+			playLeadSound(leadnote * 1.875);
+		}
+		else if (v[7]){
+			playLeadSound(leadnote * 2);
+		}
+		else {
+			playLeadSound(0);
+		}
+	}
+)
+
+var bassnote = 110;
+
+var bassSequencer = new Nexus.Sequencer('#bassStepSequencerUI',{
+ 'size': [400,200],
+ 'mode': 'toggle',
+ 'rows': 8,
+ 'columns': 8
+})
+bassSequencer.start(tempo);
+bassSequencer.on('step',function(v) {
+        if (v[0]){
+			playBassSound(bassnote);
+        }
+        else if (v[1]){
+			playBassSound(bassnote * 1.125);
+        }
+		else if (v[2]){
+			playBassSound(bassnote * 1.25);
+		}
+        
+        else if (v[3]){
+			playBassSound(bassnote * 1.333);
+        }
+		else if (v[4]){
+			playBassSound(bassnote * 1.5);
+		}
+        else if (v[5]){
+			playBassSound(bassnote * 1.666);
+        }
+		else if (v[6]){
+			playBassSound(bassnote * 1.875);
+		}
+		
+		else if (v[7]){
+			playBassSound(bassnote * 2);
+		}
+		else {
+			playBassSound(0);
+		}
+	}
+)
+
+var drumSequencer = new Nexus.Sequencer('#drumStepSequencerUI',{
+ 'size': [400,200],
+ 'mode': 'toggle',
+ 'rows': 3,
+ 'columns': 8
+})
+drumSequencer.start(tempo);
+drumSequencer.on('step',function(v) {
+		 if (v[0]){
+			kickTrigger();
+			
+        }
+		if(v[1]){
+			snareTrigger();
+		}
+		if(v[2]){
+			hihatTrigger();
+		}
+		else {
+		return;
+		}
+	}
+)
+
+
+
+
+	{
+
+	}
+
+
+	
+socket.on('stepSent', function(step,now)
+	{
+
+
+	
+	})
+
+var timeoutID;
+
+socket.on('leadSeqLegatoBoolSent',function(data){
+leadStepSequencerLegatoBool = data;
+console.log(leadStepSequencerLegatoBool + " " + data);
+});
+socket.on('bassSeqLegatoBoolSent',function(data){
+bassStepSequencerLegatoBool = data;
+console.log(bassStepSequencerLegatoBool + " " + data);
+});
+
+function playLeadSound(freq) {
+
+	if(thereIsALeadStepOSC !== true){
+		return;
+	}
+	//console.log(freq);
+
+	if(freq !== 0){
+		leadSeqOsc.frequency.value = freq;
+	}
+	if(leadStepSequencerLegatoBool === false && freq !== 0){
+		leadSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.05);
+		leadSeqAmp.gain.linearRampToValueAtTime(0.7, con.currentTime + 0.1)
+	}
+	if(leadStepSequencerLegatoBool === true && leadSeqAmp.gain.value === 0){
+		leadSeqAmp.gain.linearRampToValueAtTime(0.7, con.currentTime + 0.1)
+	}
+
+	if(leadStepSequencerLegatoBool === false && freq === 0){
+		leadSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.1)
+	}
+}
+function playBassSound(freq) {
+
+	if(thereIsABassStepOSC !== true){
+		return;
+	}
+	//console.log(freq);
+
+	if(freq !== 0){
+		bassSeqOsc.frequency.value = freq;
+	}
+	if(bassStepSequencerLegatoBool === false && freq !== 0){
+		bassSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.05);
+		bassSeqAmp.gain.linearRampToValueAtTime(0.7, con.currentTime + 0.1)
+	}
+	if(bassStepSequencerLegatoBool === true && bassSeqAmp.gain.value === 0){
+		bassSeqAmp.gain.linearRampToValueAtTime(0.7, con.currentTime + 0.1)
+	}
+
+	if(bassStepSequencerLegatoBool === false && freq === 0){
+		bassSeqAmp.gain.linearRampToValueAtTime(0, con.currentTime + 0.1)
+	}
+}
+
+
+
+
+var newLeadAlreadyChanged = true;
+
+leadSequencer.on('change',function(v) {
+	console.log(leadSequencer);
+	console.log(v);
+	console.log(leadSeq);
+	if(newLeadAlreadyChanged === false){
+	if(v){
+		
+		if(v.state === true){
+			leadSeq[v.row][v.column] = 1;
+			
+		}
+		if(v.state === false){
+			leadSeq[v.row][v.column] = 0;
+		}
+		console.log("Lead Seq just changed: " + leadSeq[v.row][v.column]);
+		newLeadAlreadyChanged = true;
+	}
+	}
+})
+
+var newBassAlreadyChanged = true;
+bassSequencer.on('change',function(v) {
+	if(newBassAlreadyChanged === false){
+		if(v){		
+			if(v.state === true){
+				bassSeq[v.row][v.column] = 1;
+			}
+			if(v.state === false){
+				bassSeq[v.row][v.column] = 0;
+			}
+			console.log("Bass Seq just changed: " + bassSeq[v.row][v.column]);
+			newBassAlreadyChanged = true;
+		}
+	}
+})
+var newDrumAlreadyChanged = true;
+drumSequencer.on('change',function(v) {
+if(newDrumAlreadyChanged === false){
+		if(v){		
+			if(v.state === true){
+				drumSeq[v.row][v.column] = 1;
+			}
+			if(v.state === false){
+				drumSeq[v.row][v.column] = 0;
+			}
+			console.log("drum Seq just changed: " + drumSeq[v.row][v.column]);
+			newDrumAlreadyChanged = true;
+		}
+	}
+})
+
+	function onLeadSynthClick(){
+	socket.emit('leadSeqChanged', leadSeq);
+	console.log('sending to server: ' + leadSeq);
+	}
+	function onBassSynthClick(){
+	socket.emit('bassSeqChanged', bassSeq);
+	console.log('sending to server: ' + bassSeq);
+	}
+	function onDrumClick(){
+	socket.emit('drumSeqChanged', drumSeq);
+	console.log('sending to server: ' + drumSeq);
+	}
+
+socket.on('leadSeqFromServer', function(leadSeqUpdated)
+{	console.log("before: " + leadSeq);
+	console.log("after:  " + leadSeqUpdated);
+	leadSeq = leadSeqUpdated;
+	leadSequencer.columns = leadSeq[0].length;
+	leadSequencer.matrix.set.all(leadSeq);
+});
+socket.on('bassSeqFromServer', function(bassSeqUpdated)
+{
+	console.log("here bass" + bassSeqUpdated);
+	bassSeq = bassSeqUpdated;
+	bassSequencer.columns = bassSeq[0].length;
+	bassSequencer.matrix.set.all(bassSeq);
+});
+
+socket.on('drumSeqFromServer', function(drumSeqUpdated)
+{
+	console.log("here drum" + drumSeqUpdated);
+	drumSeq = drumSeqUpdated;
+	drumSequencer.columns = drumSeq[0].length;
+	drumSequencer.matrix.set.all(drumSeq);
+});
+
+//Timesigchange
+//take the existing array, copy it and add or take one to the length, overwrite the old one.
+
+leadAddColumnButton.onclick = function(){
+	
+	console.log("before: " + leadSeq[1]);
+	leadSeq[0].splice(1000,0,0);
+	leadSeq[1].splice(1000,0,0);
+	leadSeq[2].splice(1000,0,0);
+	leadSeq[3].splice(1000,0,0);
+	leadSeq[4].splice(1000,0,0);
+	leadSeq[5].splice(1000,0,0);
+	leadSeq[6].splice(1000,0,0);
+	leadSeq[7].splice(1000,0,0);
+	console.log("after: " + leadSeq[1]);
+	newLeadAlreadyChanged = false;
+	onLeadSynthClick();
+}
+leadRemoveColumnButton.onclick = function(){
+	console.log("before: " + leadSeq[1]);
+	leadSeq[0].splice(-1,1);
+	leadSeq[1].splice(-1,1);
+	leadSeq[2].splice(-1,1);
+	leadSeq[3].splice(-1,1);
+	leadSeq[4].splice(-1,1);
+	leadSeq[5].splice(-1,1);
+	leadSeq[6].splice(-1,1);
+	leadSeq[7].splice(-1,1);
+	console.log("after: " + leadSeq[1]);
+	newLeadAlreadyChanged = false;
+	onLeadSynthClick();
+}
+
+bassAddColumnButton.onclick = function(){
+	
+	console.log("before: " + bassSeq[1]);
+	bassSeq[0].splice(1000,0,0);
+	bassSeq[1].splice(1000,0,0);
+	bassSeq[2].splice(1000,0,0);
+	bassSeq[3].splice(1000,0,0);
+	bassSeq[4].splice(1000,0,0);
+	bassSeq[5].splice(1000,0,0);
+	bassSeq[6].splice(1000,0,0);
+	bassSeq[7].splice(1000,0,0);
+	console.log("after: " + bassSeq[1]);
+	newBassAlreadyChanged = false;
+	onBassSynthClick();
+}
+bassRemoveColumnButton.onclick = function(){
+	console.log("before: " + bassSeq[1]);
+	bassSeq[0].splice(-1,1);
+	bassSeq[1].splice(-1,1);
+	bassSeq[2].splice(-1,1);
+	bassSeq[3].splice(-1,1);
+	bassSeq[4].splice(-1,1);
+	bassSeq[5].splice(-1,1);
+	bassSeq[6].splice(-1,1);
+	bassSeq[7].splice(-1,1);
+	console.log("after: " + bassSeq[1]);
+	newBassAlreadyChanged = false;
+	onBassSynthClick();
+}
+
+drumAddColumnButton.onclick = function(){	
+	console.log("before: " + drumSeq[1]);
+	drumSeq[0].splice(1000,0,0);
+	drumSeq[1].splice(1000,0,0);
+	drumSeq[2].splice(1000,0,0);
+	console.log("after: " + drumSeq[1]);
+	newDrumAlreadyChanged = false;
+	onDrumClick();
+}
+drumRemoveColumnButton.onclick = function(){
+	console.log("before: " + drumSeq[1]);
+	drumSeq[0].splice(-1,1);
+	drumSeq[1].splice(-1,1);
+	drumSeq[2].splice(-1,1);
+	console.log("after: " + drumSeq[1]);
+	newDrumAlreadyChanged = false;
+	onDrumClick();
+}
+
+resetTimeSig.onclick = function(){
+
+	leadSeq[0].splice(-1,0,0,0,0,0,0,0,0,0,);
+	leadSeq[1].splice(-1,0,0,0,0,0,0,0,0,0,);
+	leadSeq[2].splice(-1,0,0,0,0,0,0,0,0,0,);
+	leadSeq[3].splice(-1,0,0,0,0,0,0,0,0,0,);
+	leadSeq[4].splice(-1,0,0,0,0,0,0,0,0,0,);
+	leadSeq[5].splice(-1,0,0,0,0,0,0,0,0,0,);
+	leadSeq[6].splice(-1,0,0,0,0,0,0,0,0,0,);
+	leadSeq[7].splice(-1,0,0,0,0,0,0,0,0,0,);
+	
+	bassSeq[0].splice(-1,0,0,0,0,0,0,0,0,0,);
+	bassSeq[1].splice(-1,0,0,0,0,0,0,0,0,0,);
+	bassSeq[2].splice(-1,0,0,0,0,0,0,0,0,0,);
+	bassSeq[3].splice(-1,0,0,0,0,0,0,0,0,0,);
+	bassSeq[4].splice(-1,0,0,0,0,0,0,0,0,0,);
+	bassSeq[5].splice(-1,0,0,0,0,0,0,0,0,0,);
+	bassSeq[6].splice(-1,0,0,0,0,0,0,0,0,0,);
+	bassSeq[7].splice(-1,0,0,0,0,0,0,0,0,0,);
+	
+	drumSeq[0].splice(-1,0,0,0,0,0,0,0,0,0,);
+	drumSeq[1].splice(-1,0,0,0,0,0,0,0,0,0,);
+	drumSeq[2].splice(-1,0,0,0,0,0,0,0,0,0,);
+	
+	leadSeq[0].splice(8);
+	leadSeq[1].splice(8);
+	leadSeq[2].splice(8);
+	leadSeq[3].splice(8);
+	leadSeq[4].splice(8);
+	leadSeq[5].splice(8);
+	leadSeq[6].splice(8);
+	leadSeq[7].splice(8);
+	
+	bassSeq[0].splice(8);
+	bassSeq[1].splice(8);
+	bassSeq[2].splice(8);
+	bassSeq[3].splice(8);
+	bassSeq[4].splice(8);
+	bassSeq[5].splice(8);
+	bassSeq[6].splice(8);
+	bassSeq[7].splice(8);
+	
+	drumSeq[0].splice(8);
+	drumSeq[1].splice(8);
+	drumSeq[2].splice(8);
+
+newLeadAlreadyChanged = false;
+newBassAlreadyChanged = false;
+newDrumAlreadyChanged = false;
+onLeadSynthClick();
+onBassSynthClick();
+onDrumClick();
+}
+
+
+
+
+
+
+
+
+   
+</script>
